@@ -12,7 +12,7 @@ wss.on('connection', function connection(ws) {
 
     ws.on('message', function message(data: any) {
         const message = JSON.parse(data);
-        console.log(message);
+     //   console.log(message);
         
     });
 

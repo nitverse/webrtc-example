@@ -1,26 +1,28 @@
-import { WebSocketServer } from "ws";
+import { WebSocketServer, WebSocket } from "ws";
+import express from "express";
 import http from "http";
 
-const server = http.createServer((req, res) => {
-  if (req.url === "/status" && req.method === "GET") {
-    res.writeHead(200, { "Content-Type": "text/plain" });
-    res.end("WebSocket server is running\n");
-  } else {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Not Found\n");
-  }
+const app = express();
+
+app.get("/status", (req, res) => {
+  res.status(200).send("WebSocket server is running\n");
 });
 
+app.use((req, res) => {
+  res.status(404).send("Not Found\n");
+});
+
+const server = http.createServer(app);
 
 const wss = new WebSocketServer({ server });
 
-let senderSocket: null | WebSocket = null;
-let recieverSocket: null | WebSocket = null;
+let senderSocket: WebSocket | null = null;
+let receiverSocket: WebSocket | null = null;
 
-wss.on("connection", function connection(ws) {
+wss.on("connection", (ws: WebSocket) => {
   ws.on("error", console.error);
 
-  ws.on("message", function message(data: any) {
+  ws.on("message", (data: string) => {
     const message = JSON.parse(data);
     console.log(message);
   });
